@@ -1,68 +1,52 @@
-"use client"
+import { Header } from "@/components/header"
+import { DemoCard } from "@/components/demo-card"
 
-import { useState } from "react"
-import type { PipelinePayload } from "@/types/pipeline"
-import SummaryTab from "@/components/Tabs/SummaryTab"
-import AnalyticsTab from "@/components/Tabs/AnalyticsTab"
-import ExpertTab from "@/components/Tabs/ExpertTab"
-import HistoryTab from "@/components/Tabs/HistoryTab"
-import styles from "./page.module.css"
+const demos = [
+  {
+    title: "Document Ingestion",
+    description: "Python SDK that converts documents into vectors stored in a central knowledge store, enabling RAG agents to deliver more accurate, context-aware answers.",
+    type: "agent" as const,
+    href: "/document-ingestion",
+  },
+  {
+    title: "Agent Pipeline",
+    description: "Offers abstractions to orchestrate agent workflows and LLM pipelines, supporting low-code configuration and easy extensibility.",
+    type: "agent" as const,
+    href: "/agent-pipeline",
+  },
+  {
+    title: "RAG Retrieval",
+    description: "Welcome to our platform! Here, you can explore a variety of features designed to enhance your experience.",
+    type: "agent" as const,
+    href: "/rag-retrieval",
+  },
+  {
+    title: "Summarization",
+    description: "Welcome to our platform! Here, you can explore a variety of features designed to enhance your experience.",
+    type: "service" as const,
+    href: "/summarization",
+  },
+]
 
-type Tab = "Summary" | "Analytics" | "Expert" | "History"
-
-const TAB_ENDPOINTS: Record<Tab, string> = {
-  Summary: "/api/summary",
-  Analytics: "/api/analytics",
-  Expert: "/api/expert",
-  History: "/api/history",
-}
-
-export default function IATPlayground() {
-  const [activeTab, setActiveTab] = useState<Tab>("Summary")
-
-  const handleSendPayload = async (payload: PipelinePayload) => {
-    const endpoint = TAB_ENDPOINTS[activeTab]
-
-    console.log(`[v0] Sending payload to ${endpoint} for ${activeTab} tab:`, payload)
-
-    // In a real application, you would make an API call here:
-    // try {
-    //   const response = await fetch(endpoint, {
-    //     method: 'POST',
-    //     headers: { 'Content-Type': 'application/json' },
-    //     body: JSON.stringify(payload),
-    //   })
-    //   const data = await response.json()
-    //   console.log('[v0] API response:', data)
-    // } catch (error) {
-    //   console.error('[v0] API error:', error)
-    // }
-  }
-
+export default function HomePage() {
   return (
-    <div className={styles.container}>
-      <header className={styles.header}>
-        <h1 className={styles.title}>IAT Playground</h1>
-        <p className={styles.subtitle}>Select one example to start</p>
+    <div className="min-h-screen">
+      <header className="px-6 py-4">
+        <Header />
       </header>
-
-      <nav className={styles.tabs}>
-        {(["Summary", "Analytics", "Expert", "History"] as Tab[]).map((tab) => (
-          <button
-            key={tab}
-            className={`${styles.tab} ${activeTab === tab ? styles.tabActive : ""}`}
-            onClick={() => setActiveTab(tab)}
-          >
-            {tab}
-          </button>
-        ))}
-      </nav>
-
-      <main className={styles.main}>
-        {activeTab === "Summary" && <SummaryTab onSendPayload={handleSendPayload} />}
-        {activeTab === "Analytics" && <AnalyticsTab onSendPayload={handleSendPayload} />}
-        {activeTab === "Expert" && <ExpertTab onSendPayload={handleSendPayload} />}
-        {activeTab === "History" && <HistoryTab />}
+      <main className="px-6 py-12">
+        <h1 className="text-center text-4xl font-serif text-foreground mb-12">Demos</h1>
+        <div className="mx-auto max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-6">
+          {demos.map((demo) => (
+            <DemoCard
+              key={demo.title}
+              title={demo.title}
+              description={demo.description}
+              type={demo.type}
+              href={demo.href}
+            />
+          ))}
+        </div>
       </main>
     </div>
   )
