@@ -8,10 +8,9 @@ interface UseCaseSidebarProps {
 }
 
 const useCases = [
-  { id: 1, label: "Use Case 1" },
-  { id: 2, label: "Use Case 2" },
-  { id: 3, label: "Use Case 3" },
-  { id: 4, label: "Use Case 4" },
+  { id: 1, label: "xx Summarization" },
+  { id: 2, label: "xxx Summarization" },
+  { id: 3, label: "xx Summarization" },
 ]
 
 export function UseCaseSidebar({ activeCase, onCaseChange }: UseCaseSidebarProps) {

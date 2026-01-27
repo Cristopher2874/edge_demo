@@ -23,6 +23,7 @@ interface PipelineConfig {
   type: string
   piiMasking: boolean
   classesToSelect: string
+  model: string
 }
 
 interface PipelineSidebarProps {
@@ -36,13 +37,14 @@ export function PipelineSidebar({ onResetConfig }: PipelineSidebarProps) {
     type: "full-conversation",
     piiMasking: false,
     classesToSelect: "value",
+    model: "gpt"
   })
 
   const [openSections, setOpenSections] = useState({
-    entry: true,
-    guardrail: true,
+    entry: false,
+    guardrail: false,
     summaryNode: false,
-    taggingNode: true,
+    taggingNode: false,
   })
 
   const toggleSection = (section: keyof typeof openSections) => {
@@ -120,7 +122,16 @@ export function PipelineSidebar({ onResetConfig }: PipelineSidebarProps) {
             Summary Node
           </CollapsibleTrigger>
           <CollapsibleContent className="pt-4">
-            <p className="text-sm text-[#6a655d]">No configuration options available.</p>
+            <ConfigSelect
+              label="Model"
+              value={config.model}
+              onValueChange={(value) => setConfig((prev) => ({ ...prev, model: value }))}
+              options={[
+                { value: "gpt", label: "gpt" },
+                { value: "grok", label: "grok" },
+                { value: "cohere", label: "cohere" },
+              ]}
+            />
           </CollapsibleContent>
         </Collapsible>
 

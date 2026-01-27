@@ -9,27 +9,81 @@ interface MainContentProps {
   activeCase: number
 }
 
+interface SummaryData {
+  conversationId: string;
+  configId: string;
+  summary: string;
+  tags: string[];
+}
+
 const useCaseDescriptions: Record<number, string> = {
-  1: "Use case 1 blurb: Explore the exciting possibilities of Use Case 1, where innovative solutions meet real-world challenges. Discover how this approach can transform your workflow and enhance productivity!",
-  2: "Use case 2 blurb: Dive into the capabilities of Use Case 2, designed to streamline complex processes and deliver actionable insights for your business needs.",
-  3: "Use case 3 blurb: Experience the power of Use Case 3, which combines advanced algorithms with intuitive design to solve challenging summarization tasks.",
-  4: "Use case 4 blurb: Unlock the potential of Use Case 4, offering comprehensive summarization solutions tailored for enterprise-scale applications.",
+  1: "ss-Summarization demo",
+  2: "ss-Summarization demo",
+  3: "ss-Summarization demo",
 }
 
 export function MainContent({ activeCase }: MainContentProps) {
   const [inputText, setInputText] = useState("")
   const [outputText, setOutputText] = useState("")
   const [isGenerating, setIsGenerating] = useState(false)
+  const [summaryData, setSummaryData] = useState<SummaryData>({
+    conversationId: '',
+    configId: '',
+    summary: '',
+    tags: [],
+  })
 
-  const handleGenerate = () => {
-    setIsGenerating(true)
-    // Simulate generation
-    setTimeout(() => {
-      setOutputText(`Generated summary for Use Case ${activeCase}: This is a sample output demonstrating the summarization capabilities.`)
-      setIsGenerating(false)
-    }, 1500)
-  }
+  const SVC_URL = "xx"
 
+  const handleGenerate = async () => {
+    setIsGenerating(true);
+
+    const format_instructions = {"length": "long", "format": "bullet", "section": "issue_action"};
+    const currentTime = Date.now() / 1000;
+
+    const sampleBody = {
+      "conversation_id": "test-conv",
+      "config_id": "test-conf",
+      "conversations": [
+        {
+          "tag": "SpeakerA",
+          "conversation": inputText.slice(0, -15),
+          "metadata": { "timestamp": currentTime },
+        },
+        {
+          "tag": "SpeakerA",
+          "conversation": inputText.slice(-15),
+          "metadata": { "timestamp": currentTime },
+        },
+      ],
+      "format_instructions": format_instructions,
+      "pipeline_type": "default"
+    };
+
+    try {
+      const response = await fetch(SVC_URL, {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(sampleBody)
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const responseData = await response.json();
+      console.log(responseData);
+      setSummaryData(responseData);
+      setOutputText(JSON.stringify(responseData, null, 2));
+    } catch (error) {
+      console.error('Error:', error);
+      setOutputText('Failed to generate summary');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
   return (
     <div className="flex-1 flex flex-col min-w-0">
       <div className="flex items-start justify-between gap-4 mb-4">
@@ -77,7 +131,15 @@ export function MainContent({ activeCase }: MainContentProps) {
           </TabsList>
           <TabsContent value="output" className="mt-4">
             <div className="min-h-[150px] rounded-lg border border-[#4a4640] bg-[#3a3733] p-4 text-sm text-foreground">
-              {outputText || <span className="text-[#6a655d]">Output will appear here...</span>}
+              {summaryData.conversationId && (
+                <div>
+                  <p><strong>Conversation ID:</strong> {summaryData.conversationId}</p>
+                  <p><strong>Config ID:</strong> {summaryData.configId}</p>
+                  <p><strong>Summary:</strong> {summaryData.summary}</p>
+                  <p><strong>Tags:</strong> {summaryData.tags.join(', ')}</p>
+                </div>
+              )}
+              {!summaryData.conversationId && (outputText || <span className="text-[#6a655d]">Output will appear here...</span>)}
             </div>
           </TabsContent>
           <TabsContent value="log" className="mt-4">
